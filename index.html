@@ -413,76 +413,6 @@ h3{
 }
 
 
-
-/* -------- INFO SECTION (KANAN-KIRI) -------- */
-.info-section {
-    padding: 80px 10%;
-    background-color: #f5f5f5;
-    border-radius: 10%;
-}
-
-.info-container {
-    display: flex;
-    flex-direction: column;
-    gap: 50px;
-}
-
-.info-box {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 20px;
-    opacity: 0; /* Untuk efek animasi */
-    transform: translateY(50px);
-    transition: all 0.8s ease-in-out;
-}
-
-.info-box.active {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-.info-box.left {
-    flex-direction: row;
-}
-
-.info-box.right {
-    flex-direction: row-reverse;
-}
-
-.info-text {
-    flex: 1;
-    padding: 20px;
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-    text-align: center;
-}
-
-.info-text h3 {
-    font-size: 1.8rem;
-    color: #333;
-    margin-bottom: 10px;
-}
-
-.info-text p {
-    font-size: 1rem;
-    color: #666;
-}
-
-.info-image {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-}
-
-.info-image img {
-    width: 100%;
-    max-width: 400px;
-    border-radius: 10px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-}
-
 /* Responsive */
 @media (max-width: 768px) {
     .info-box {
@@ -776,7 +706,7 @@ footer{
                 </p>
             </div>
             <div class="featured-text-btn">
-                <a href="#about" class="btn blue-btn">About</a>
+                <a href="/daftar" class="btn blue-btn">Daftar</a>
                 <a href="https://www.instagram.com/funvibeplayfest" class="btn">Instagram<i class="uil uil-instagram"></i></a>
             </div>
           </div>
@@ -821,30 +751,6 @@ footer{
 
 
 
-       <!-- -------------- INFO SECTION (KANAN-KIRI) ---------------- -->
-<section class="info-section">
-  <div class="info-container">
-      <div class="info-box left">
-          <div class="info-image">
-              <img src="https://www.lpmdimensi.com/wp-content/uploads/2022/09/IMG_202209258_201507325.jpeg" alt="Info 1">
-          </div>
-          <div class="info-text">
-              <h3>Permainan Tradisional</h3>
-              <p>Menyediakan permainan klasik seperti congklak, galasin, estafet kelereng, dan bekel. Tujuannya adalah melestarikan budaya permainan yang telah dimainkan oleh generasi sebelumnya.</p>
-          </div>
-      </div>
-
-      <div class="info-box right">
-          <div class="info-text">
-              <h3>Permainan Modern</h3>
-              <p>Menyediakan permainan inovatif seperti Uno, ular tangga, monopoli, dan catur. yang menunjukkan perkembangan inovatif dalam dunia permainan.</p>
-          </div>
-          <div class="info-image">
-              <img src="https://blue.kumparan.com/image/upload/fl_progressive,fl_lossy,c_fill,q_auto:best,w_640/v1630057391/tb8w1ntb28ryla6mxwtw.jpg" alt="Info 2">
-          </div>
-      </div>
-  </div>
-</section>
 
 
        <!-- -------------- CONTACT BOX ---------------- -->
@@ -902,6 +808,7 @@ footer{
         </div>
         <div class="footer-social-icons">
             <a href="https://www.instagram.com/funvibeplayfest" class="icon"><i class="uil uil-instagram"></i></a>
+            <a href="https://wa.me/" class="icon"><i class="uil uil-whatsapp"></i></a>
         </div>
         <div class="bottom-footer">
             <p>Copyright &copy; <a href="https://luthfi.xyz" style="text-decoration: none;">Luthfi</a> - All rights reserved</p>
