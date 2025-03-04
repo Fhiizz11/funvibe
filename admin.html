@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            background: #dfd8d8;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 800px;
+            text-align: center;
+            overflow-x: auto;
+        }
+        h2 {
+            margin-bottom: 15px;
+            color: #444;
+        }
+        input, button {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            width: 100%;
+        }
+        button {
+            background: #0037da;
+            color: white;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover {
+            background: #5a7bd3;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        .btn-out {
+            background: #c22121;
+            color: white;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn-out:hover {
+            background: #a61a1a;
+        }
+        @media (max-width: 600px) {
+            table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+            th, td {
+                padding: 8px;
+                font-size: 14px;
+            }
+            button {
+                font-size: 12px;
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Admin Dashboard</h2>
+        <input type="text" id="search" placeholder="Cari Nama..." onkeyup="cariData()">
+        <button class="btn-out" onclick="logout()">Logout</button>
+        <button onclick="tambahData()">Tambah Data</button>
+        <div style="overflow-x:auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nama</th>
+                        <th>Kelas</th>
+                        <th>WhatsApp</th>
+                        <th>IP</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="data-body"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyC2uQXpTHpASaUmBrOKYyxO591hOdEnVnA",
+            authDomain: "funvibe-16423.firebaseapp.com",
+            projectId: "funvibe-16423",
+            storageBucket: "funvibe-16423.firebasestorage.app",
+            messagingSenderId: "29510383755",
+            appId: "1:29510383755:web:238ba741185d9474497c8e",
+            measurementId: "G-SP6LF8FVB9"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        const dataBody = document.getElementById("data-body");
+        const searchInput = document.getElementById("search");
+        let dataArr = [];
+
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                window.location.href = "login.html";
+            }
+        });
+
+        async function loadData() {
+            const querySnapshot = await getDocs(collection(db, "pendaftar"));
+            dataArr = [];
+            querySnapshot.forEach((doc) => {
+                let data = doc.data();
+                data.id = doc.id;
+                dataArr.push(data);
+            });
+            renderTable(dataArr);
+        }
+
+        function renderTable(dataArr) {
+            dataBody.innerHTML = "";
+            dataArr.forEach(data => {
+                const row = `<tr>
+                    <td>${data.nama}</td>
+                    <td>${data.kelas}</td>
+                    <td>${data.whatsapp}</td>
+                    <td>${data.ip}</td>
+                    <td>
+                        <button onclick="editData('${data.id}', '${data.nama}', '${data.kelas}', '${data.whatsapp}')">Edit</button>
+                        <button onclick="hapusData('${data.id}')">Hapus</button>
+                    </td>
+                </tr>`;
+                dataBody.innerHTML += row;
+            });
+        }
+
+        window.cariData = function() {
+            const keyword = searchInput.value.toLowerCase();
+            const filteredData = dataArr.filter(item => item.nama.toLowerCase().includes(keyword));
+            renderTable(filteredData);
+        }
+
+        window.tambahData = async function() {
+            const { value: formValues } = await Swal.fire({
+                title: 'Tambah Data',
+                html: `<input id="nama" class="swal2-input" placeholder="Nama">
+                      <input id="kelas" class="swal2-input" placeholder="Kelas">
+                      <input id="whatsapp" class="swal2-input" placeholder="WhatsApp">`,
+                focusConfirm: false,
+                preConfirm: () => {
+                    return {
+                        nama: document.getElementById('nama').value,
+                        kelas: document.getElementById('kelas').value,
+                        whatsapp: document.getElementById('whatsapp').value
+                    };
+                }
+            });
+            if (formValues && formValues.nama && formValues.kelas && formValues.whatsapp) {
+                await addDoc(collection(db, "pendaftar"), formValues);
+                Swal.fire('Berhasil', 'Data berhasil ditambahkan!', 'success');
+                loadData();
+            }
+        }
+
+        window.editData = async function(id, nama, kelas, whatsapp) {
+            const { value: formValues } = await Swal.fire({
+                title: 'Edit Data',
+                html: `<input id="nama" class="swal2-input" value="${nama}" placeholder="Nama">
+                      <input id="kelas" class="swal2-input" value="${kelas}" placeholder="Kelas">
+                      <input id="whatsapp" class="swal2-input" value="${whatsapp}" placeholder="WhatsApp">`,
+                focusConfirm: false,
+                preConfirm: () => {
+                    return {
+                        nama: document.getElementById('nama').value,
+                        kelas: document.getElementById('kelas').value,
+                        whatsapp: document.getElementById('whatsapp').value
+                    };
+                }
+            });
+            if (formValues) {
+                await updateDoc(doc(db, "pendaftar", id), formValues);
+                Swal.fire('Berhasil', 'Data berhasil diperbarui!', 'success');
+                loadData();
+            }
+        }
+
+        window.hapusData = async function(id) {
+            await deleteDoc(doc(db, "pendaftar", id));
+            Swal.fire('Berhasil', 'Data berhasil dihapus!', 'success');
+            loadData();
+        }
+
+        window.logout = function() {
+            Swal.fire({
+                title: "Konfirmasi Logout",
+                text: "Apakah Anda yakin ingin logout?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: "Ya, Logout",
+                cancelButtonText: "Batal"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    signOut(auth).then(() => {
+                        Swal.fire("Logout Berhasil", "Anda telah keluar!", "success").then(() => {
+                            window.location.href = "login.html";
+                        });
+                    });
+                }
+            });
+        };
+
+        loadData();
+    </script>
+</body>
+</html>

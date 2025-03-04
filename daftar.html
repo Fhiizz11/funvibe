@@ -1,0 +1,157 @@
+<!-- halaman_daftar.html -->
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar FunVibe PlayFest</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: #d0d2d9;
+        }
+        .container {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+            animation: fadeIn 0.8s ease-in-out;
+        }
+        h2 {
+            margin-bottom: 20px;
+            color: #444;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+        input:focus {
+            border-color: #6e8efb;
+            outline: none;
+            box-shadow: 0px 0px 8px rgba(110, 142, 251, 0.5);
+        }
+        button {
+            width: 100%;
+            background: #6e8efb;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #5a7bd3;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Untuk browser Chrome, Safari, Edge, dan Opera */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Daftar FunVibe PlayFest</h2>
+        <input type="text" id="nama" placeholder="Nama Lengkap" required>
+        <input type="text" id="kelas" placeholder="Kelas" required>
+        <input type="number" id="whatsapp" placeholder="Nomor WhatsApp" required>
+        <button onclick="kirimForm()">Daftar</button>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+  apiKey: "AIzaSyC2uQXpTHpASaUmBrOKYyxO591hOdEnVnA",
+  authDomain: "funvibe-16423.firebaseapp.com",
+  projectId: "funvibe-16423",
+  storageBucket: "funvibe-16423.firebasestorage.app",
+  messagingSenderId: "29510383755",
+  appId: "1:29510383755:web:238ba741185d9474497c8e",
+  measurementId: "G-SP6LF8FVB9"
+};
+        
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        async function getIP() {
+            const res = await fetch('https://api64.ipify.org?format=json');
+            const data = await res.json();
+            return data.ip;
+        }
+
+        async function kirimForm() {
+            const nama = document.getElementById("nama").value;
+            const kelas = document.getElementById("kelas").value;
+            const whatsapp = document.getElementById("whatsapp").value;
+            
+            if (!nama || !kelas || !whatsapp) {
+                Swal.fire('Error', 'Semua bidang harus diisi!', 'error');
+                return;
+            }
+
+            Swal.fire({
+                title: 'Mengirim...',
+                text: 'Mohon tunggu sebentar.',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+            
+            const ip = await getIP();
+            const q = query(collection(db, "pendaftar"), where("ip", "==", ip));
+            const snapshot = await getDocs(q);
+            if (!snapshot.empty) {
+                Swal.fire('Error', 'Anda sudah mendaftar!', 'error');
+                return;
+            }
+            
+            try {
+                await addDoc(collection(db, "pendaftar"), { nama, kelas, whatsapp, ip });
+                Swal.fire('Berhasil', 'Pendaftaran sukses!', 'success');
+            } catch (error) {
+                Swal.fire('Error', 'Terjadi kesalahan, coba lagi.', 'error');
+            }
+        }
+
+        // Memastikan fungsi kirimForm bisa diakses global
+        window.kirimForm = kirimForm;
+    </script>
+</body>
+</html>

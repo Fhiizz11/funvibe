@@ -1,0 +1,103 @@
+<!-- halaman_login.html -->
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Admin</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: #e7dcdc;
+        }
+        .login-container {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            width: 300px;
+        }
+        h2 {
+            margin-bottom: 15px;
+            color: #444;
+        }
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        button {
+            background: #6e8efb;
+            color: white;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover {
+            background: #5a7bd3;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h2>Login Admin</h2>
+        <input type="email" id="email" placeholder="Email" required>
+        <input type="password" id="password" placeholder="Password" required>
+        <button onclick="login()">Login</button>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+
+        const firebaseConfig = {
+  apiKey: "AIzaSyC2uQXpTHpASaUmBrOKYyxO591hOdEnVnA",
+  authDomain: "funvibe-16423.firebaseapp.com",
+  projectId: "funvibe-16423",
+  storageBucket: "funvibe-16423.firebasestorage.app",
+  messagingSenderId: "29510383755",
+  appId: "1:29510383755:web:238ba741185d9474497c8e",
+  measurementId: "G-SP6LF8FVB9"
+};
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        window.login = function() {
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+
+            signInWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    Swal.fire('Berhasil', 'Login berhasil!', 'success').then(() => {
+                        window.location.href = 'admin.html';
+                    });
+                })
+                .catch((error) => {
+                    Swal.fire('Gagal', 'Email atau password salah!', 'error');
+                });
+        }
+
+        onAuthStateChanged(auth, (user) => {
+        if (user) {
+            // Jika pengguna sudah login, redirect ke halaman admin
+            window.location.href = "admin.html";
+        }
+    });
+    </script>
+</body>
+</html>
