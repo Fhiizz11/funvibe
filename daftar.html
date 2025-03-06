@@ -1,215 +1,104 @@
-<!-- halaman_daftar.html -->
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daftar Funvibe Playfest</title>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script type="module" src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js"></script>
-    <script type="module" src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js"></script>
-
-        <!-- Primary Meta Tags -->
-<meta name="title" content="PENDAFTARAN FUNVIBE PLAYFEST" />
-<meta name="description" content="Halo selamat datang di website PENDAFTARAN FUNVIBE PLAYFEST" />
-
-<!-- Open Graph / Facebook -->
-<meta property="og:type" content="website" />
-<meta property="og:url" content="https://funvibe.luthfi.xyz/daftar" />
-<meta property="og:title" content="PENDAFTARAN FUNVIBE PLAYFEST" />
-<meta property="og:description" content="Halo selamat datang di website PENDAFTARAN FUNVIBE PLAYFEST" />
-<meta property="og:image" content="https://files.catbox.moe/vo19pg.webp" />
-
-<!-- Twitter -->
-<meta property="twitter:card" content="summary_large_image" />
-<meta property="twitter:url" content="https://funvibe.luthfi.xyz/daftar" />
-<meta property="twitter:title" content="PENDAFTARAN FUNVIBE PLAYFEST" />
-<meta property="twitter:description" content="Halo selamat datang di website PENDAFTARAN FUNVIBE PLAYFEST" />
-<meta property="twitter:image" content="https://files.catbox.moe/vo19pg.webp" />
-
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background: #d0d2d9;
-        }
-        .container {
-            background: white;
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-            text-align: center;
-            width: 100%;
-            max-width: 400px;
-            animation: fadeIn 0.8s ease-in-out;
-        }
-        h2, p {
-            margin-bottom: 20px;
-            color: #444;
-        }
-        input {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            transition: 0.3s;
-        }
-        input:focus {
-            border-color: #6e8efb;
-            outline: none;
-            box-shadow: 0px 0px 8px rgba(110, 142, 251, 0.5);
-        }
-        button {
-            width: 100%;
-            background: #6e8efb;
-            color: white;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: 0.3s;
-            font-size: 16px;
-        }
-        button:hover {
-            background: #5a7bd3;
-        }
-        .bottom-footer{
-            font-size: 14px;
-            margin-top: 10px;
-        }
-        .input-group {
-            display: flex;
-            align-items: center;
-            width: 100%;
-            overflow: hidden;
-            background: white;
-        }
-        .country-code {
-            background: #f1f1f1;
-            padding: 12px;
-            font-size: 16px;
-            border-right: 1px solid #ddd;
-            border-radius: 5px;
-        }
-        input#whatsapp {
-            border: none;
-            padding: 12px;
-            width: 100%;
-            outline: none;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-        }
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        input[type=number]::-webkit-inner-spin-button,
-        input[type=number]::-webkit-outer-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-    </style>
+    <title>Maintenance</title>
 </head>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background: #d0d2d9;
+    color: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    text-align: center;
+    padding: 20px;
+}
+
+.container {
+    max-width: 500px;
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+.maintenance-img {
+    width: 80%;
+    max-width: 300px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+}
+
+h1 {
+    font-size: 24px;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+p {
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+
+.contact p {
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.contact a {
+    display: block;
+    text-decoration: none;
+    color: black;
+    font-weight: 400;
+    margin-top: 5px;
+    transition: 0.3s;
+}
+
+.contact a:hover {
+    text-decoration: underline;
+}
+
+/* Responsif */
+@media (max-width: 480px) {
+    .container {
+        padding: 20px;
+    }
+
+    h1 {
+        font-size: 20px;
+    }
+
+    p {
+        font-size: 14px;
+    }
+}
+</style>
+
 <body>
     <div class="container">
-        <h2>Daftar Funvibe Playfest</h2>
-        <p>daftarkan diri kamu dengan mengisi form pendaftaran dibawah ini</p>
-        <input type="text" id="nama" placeholder="Nama Lengkap" required>
-        <input type="text" id="kelas" placeholder="Kelas" required>
-        
-        <div class="input-group">
-            <span class="country-code">+62</span>
-            <input type="tel" id="whatsapp" placeholder="Nomor WhatsApp" required oninput="formatWhatsApp(this)">
-        </div>
-        
-        <button onclick="kirimForm()">Daftar</button>
-        <br>
-        <br>
-        <br>
-        <br>
-        <div class="bottom-footer">
-            <p>Copyright &copy; <a href="https://luthfi.xyz" style="text-decoration: none;">Luthfi</a> - All rights reserved</p>
+        <div class="content">
+            <img src="https://files.catbox.moe/vo19pg.webp" alt="Maintenance" class="maintenance-img">
+            <h1>Form Pendaftaran Belum Dibuka</h1>
+            <p>Kami sedang melakukan pemeliharaan untuk meningkatkan layanan. Silakan kembali lagi nanti.</p>
+            <div class="contact">
+                <p>Hubungi Kami:</p>
+                <a href="https://instagram/funvibeplayfest" class="email">@funvibeplayfest</a>
+            </div>
         </div>
     </div>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyC2uQXpTHpASaUmBrOKYyxO591hOdEnVnA",
-            authDomain: "funvibe-16423.firebaseapp.com",
-            projectId: "funvibe-16423",
-            storageBucket: "funvibe-16423.firebasestorage.app",
-            messagingSenderId: "29510383755",
-            appId: "1:29510383755:web:238ba741185d9474497c8e",
-            measurementId: "G-SP6LF8FVB9"
-        };
-        
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        async function getIP() {
-            const res = await fetch('https://api64.ipify.org?format=json');
-            const data = await res.json();
-            return data.ip;
-        }
-
-        async function kirimForm() {
-            const nama = document.getElementById("nama").value.trim();
-            const kelas = document.getElementById("kelas").value.trim();
-            let whatsapp = document.getElementById("whatsapp").value.trim();
-
-            if (!nama || !kelas || !whatsapp) {
-                Swal.fire('Error', 'Semua bidang harus diisi!', 'error');
-                return;
-            }
-
-            Swal.fire({
-                title: 'Mengirim...',
-                text: 'Mohon tunggu sebentar.',
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
-            });
-
-            if (whatsapp.startsWith("0")) {
-                whatsapp = whatsapp.substring(1);
-            }
-
-            const ip = await getIP();
-            const q = query(collection(db, "pendaftar"), where("ip", "==", ip));
-            const snapshot = await getDocs(q);
-
-            if (!snapshot.empty) {
-                Swal.fire('Error', 'Anda sudah mendaftar!', 'error');
-                return;
-            }
-
-            try {
-                await addDoc(collection(db, "pendaftar"), { nama, kelas, whatsapp, ip });
-                Swal.fire('Berhasil', 'Pendaftaran sukses!', 'success');
-            } catch (error) {
-                Swal.fire('Error', 'Terjadi kesalahan, coba lagi.', 'error');
-            }
-        }
-        window.kirimForm = kirimForm;
-    </script>
 </body>
 </html>
