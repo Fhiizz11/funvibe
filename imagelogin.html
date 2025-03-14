@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: #c7b6b6;
+        }
+        .login-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+        }
+        .login-container h2 {
+            margin-bottom: 1rem;
+        }
+        .input-group {
+            margin-bottom: 1rem;
+            text-align: left;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+        .input-group input:focus {
+            border-color: #667eea;
+            outline: none;
+        }
+        .btn {
+            width: 100%;
+            background: #667eea;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn:hover {
+            background: #5563c1;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h2>Login</h2>
+        <div class="input-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" placeholder="Enter your email" required>
+        </div>
+        <div class="input-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="Enter your password" required>
+        </div>
+        <button class="btn" id="loginButton" onclick="login()">Login</button>
+    </div>
+
+    <script type="module">
+        import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+        const supabaseUrl = 'https://czqlfgvzzpmgddkjvsps.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN6cWxmZ3Z6enBtZ2Rka2p2c3BzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzI5MzgxOTUsImV4cCI6MjA0ODUxNDE5NX0.35iolc9qnkla8hK1ycYL6qOjEujK2YpSOoOGHz-fzPI';
+        const supabase = createClient(supabaseUrl, supabaseKey);
+
+        async function login() {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    try {
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+        if (error) {
+            throw error; // Lempar error agar masuk ke catch
+        }
+
+        Swal.fire({
+            icon: "success",
+            title: "Login Berhasil",
+            text: "Anda akan dialihkan ke dashboard",
+            timer: 2000,
+            showConfirmButton: false
+        }).then(() => {
+            window.location.href = "/doc/admin";
+        });
+
+    } catch (err) {
+        console.error("Login Error:", err.message);
+        Swal.fire({
+            icon: "error",
+            title: "Login Gagal",
+            text: err.message
+        });
+    }
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    document.getElementById("loginButton").addEventListener("click", login);
+});
+
+
+    </script>
+</body>
+</html>

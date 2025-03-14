@@ -71,6 +71,25 @@
         .btn-out:hover {
             background: #a61a1a;
         }
+        .btn-dr {
+            background: #189e3e;
+            color: white;
+            cursor: pointer;
+            transition: 0.3s;
+            text-align: center;
+        }
+        .btn-dr a {
+            text-decoration: none;
+            cursor: pointer;
+            transition: 0.3s;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .btn-dr:hover {
+            background: #189e3e;
+        }
         @media (max-width: 600px) {
             table {
                 display: block;
@@ -93,6 +112,7 @@
         <h2>Admin Dashboard</h2>
         <input type="text" id="search" placeholder="Cari Nama..." onkeyup="cariData()">
         <button class="btn-out" onclick="logout()">Logout</button>
+        <button class="btn-dr"><a href="/doc/admin">Drive</a></button>
         <button onclick="tambahData()">Tambah Data</button>
         <div style="overflow-x:auto;">
             <table>
@@ -100,6 +120,7 @@
                     <tr>
                         <th>Nama</th>
                         <th>Kelas</th>
+                        <th>Instagram</th>
                         <th>WhatsApp</th>
                         <th>IP</th>
                         <th>Aksi</th>
@@ -134,7 +155,7 @@
 
         onAuthStateChanged(auth, (user) => {
             if (!user) {
-                window.location.href = "login.html";
+                window.location.href = "/login";
             }
         });
 
@@ -150,21 +171,26 @@
         }
 
         function renderTable(dataArr) {
-            dataBody.innerHTML = "";
-            dataArr.forEach(data => {
-                const row = `<tr>
-                    <td>${data.nama}</td>
-                    <td>${data.kelas}</td>
-                    <td>${data.whatsapp}</td>
-                    <td>${data.ip}</td>
-                    <td>
-                        <button onclick="editData('${data.id}', '${data.nama}', '${data.kelas}', '${data.whatsapp}')">Edit</button>
-                        <button onclick="hapusData('${data.id}')">Hapus</button>
-                    </td>
-                </tr>`;
-                dataBody.innerHTML += row;
-            });
-        }
+    dataBody.innerHTML = "";
+    dataArr.forEach(data => {
+        let formattedNumber = data.whatsapp?.startsWith("62") ? data.whatsapp : "62" + (data.whatsapp || "");
+        let formattedUser = data.instagram ? (data.instagram.startsWith("@") ? data.instagram.substring(1) : data.instagram) : "unknown"; // Gunakan "unknown" jika null
+
+        const row = `<tr>
+            <td>${data.nama || "Tanpa Nama"}</td>
+            <td>${data.kelas || "-"}</td>
+            <td><a href="https://instagram.com/${formattedUser}" target="_blank">@${formattedUser}</a></td>
+            <td><a href="https://wa.me/${formattedNumber}" target="_blank">${data.whatsapp || "-"}</a></td>
+            <td>${data.ip || "-"}</td>
+            <td>
+                <button onclick="editData('${data.id}', '${data.nama || ""}', '${data.kelas || ""}', '${data.instagram || ""}', '${data.whatsapp || ""}')">Edit</button>
+                <button onclick="hapusData('${data.id}')">Hapus</button>
+            </td>
+        </tr>`;
+        dataBody.innerHTML += row;
+    });
+}
+
 
         window.cariData = function() {
             const keyword = searchInput.value.toLowerCase();
@@ -177,34 +203,38 @@
                 title: 'Tambah Data',
                 html: `<input id="nama" class="swal2-input" placeholder="Nama">
                       <input id="kelas" class="swal2-input" placeholder="Kelas">
+                      <input id="instagram" class="swal2-input" placeholder="Instagram">
                       <input id="whatsapp" class="swal2-input" placeholder="WhatsApp">`,
                 focusConfirm: false,
                 preConfirm: () => {
                     return {
                         nama: document.getElementById('nama').value,
                         kelas: document.getElementById('kelas').value,
+                        instagram: document.getElementById('instagram').value,
                         whatsapp: document.getElementById('whatsapp').value
                     };
                 }
             });
-            if (formValues && formValues.nama && formValues.kelas && formValues.whatsapp) {
+            if (formValues && formValues.nama && formValues.kelas && formValues.instagram && formValues.whatsapp) {
                 await addDoc(collection(db, "pendaftar"), formValues);
                 Swal.fire('Berhasil', 'Data berhasil ditambahkan!', 'success');
                 loadData();
             }
         }
 
-        window.editData = async function(id, nama, kelas, whatsapp) {
+        window.editData = async function(id, nama, kelas, instagram, whatsapp) {
             const { value: formValues } = await Swal.fire({
                 title: 'Edit Data',
                 html: `<input id="nama" class="swal2-input" value="${nama}" placeholder="Nama">
                       <input id="kelas" class="swal2-input" value="${kelas}" placeholder="Kelas">
+                      <input id="instagram" class="swal2-input" value="${instagram}" placeholder="Instagram">
                       <input id="whatsapp" class="swal2-input" value="${whatsapp}" placeholder="WhatsApp">`,
                 focusConfirm: false,
                 preConfirm: () => {
                     return {
                         nama: document.getElementById('nama').value,
                         kelas: document.getElementById('kelas').value,
+                        instagram: document.getElementById('instagram').value,
                         whatsapp: document.getElementById('whatsapp').value
                     };
                 }
@@ -236,7 +266,7 @@
                 if (result.isConfirmed) {
                     signOut(auth).then(() => {
                         Swal.fire("Logout Berhasil", "Anda telah keluar!", "success").then(() => {
-                            window.location.href = "login.html";
+                            window.location.href = "/login";
                         });
                     });
                 }

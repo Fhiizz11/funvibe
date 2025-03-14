@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gallery</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Funvibe Playfest</h1>
+        <br>
+        <h3>Dokumentasi</h3>
+        <br>
+        <br>
+        <div class="gallery" id="gallery"></div>
+    </div>
+    
+    <div class="modal" id="modal">
+        <span class="close" id="close">&times;</span>
+        <div class="modal-wrapper">
+            <img class="modal-content" id="modal-img">
+            <a id="download" class="download-btn"><i class="fas fa-download"></i></a>
+        </div>
+    </div>
+</body>
+</html>
+
+<style>
+/* Global Reset */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background: #f4f4f4;
+}
+
+/* Container */
+.container {
+    padding: 20px;
+}
+
+/* Gallery Grid */
+.gallery {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);/* Ukuran gambar lebih kecil */
+    gap: 5px;
+    padding: 10px;
+    max-width: 800px; /* Membatasi ukuran galeri di desktop */
+    margin: auto; /* Agar tetap di tengah */
+}
+
+/* Gambar dalam Gallery */
+.gallery img {
+    width: 100%;
+    max-width: 150px; /* Membatasi ukuran maksimum gambar */
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: transform 0.3s ease-in-out;
+}
+
+.gallery img:hover {
+    transform: scale(1.1);
+}
+
+/* Modal Overlay */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Wrapper untuk gambar di modal */
+.modal-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    max-width: 90%;
+    max-height: 90vh;
+    position: relative;
+    transform: scale(0.8);
+    transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+}
+
+.modal.show .modal-wrapper {
+    transform: scale(1);
+    opacity: 1;
+}
+
+/* Gambar di dalam Modal */
+.modal-content {
+    max-width: 100%;
+    max-height: 80vh;
+    object-fit: contain;
+    border-radius: 10px;
+}
+
+/* Tombol Close */
+.close {
+    position: absolute;
+    top: 15px;
+    right: 25px;
+    font-size: 35px;
+    color: white;
+    cursor: pointer;
+}
+
+/* Tombol Download */
+.download-btn {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    border-radius: 50%;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 45px;
+    height: 45px;
+    transition: background 0.3s ease;
+}
+
+.download-btn:hover {
+    background: rgba(0, 0, 0, 0.8);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Responsive untuk Mobile */
+@media screen and (max-width: 600px) {
+    .gallery {
+        grid-template-columns: repeat(3, 1fr);
+        max-width: 100%;
+    }
+    
+    .modal-content {
+        max-width: 95%;
+        max-height: 75vh;
+    }
+
+    .download-btn {
+        bottom: 15px;
+        right: 15px;
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+    }
+}
+
+</style>
+
+<script type="module">
+// Inisialisasi Supabase
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+const SUPABASE_URL = "https://czqlfgvzzpmgddkjvsps.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN6cWxmZ3Z6enBtZ2Rka2p2c3BzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzI5MzgxOTUsImV4cCI6MjA0ODUxNDE5NX0.35iolc9qnkla8hK1ycYL6qOjEujK2YpSOoOGHz-fzPI";
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// Referensi DOM
+const galleryContainer = document.getElementById("gallery");
+const modal = document.getElementById("modal");
+const modalImg = document.getElementById("modal-img");
+const closeModal = document.getElementById("close");
+const downloadBtn = document.getElementById("download");
+let currentImageUrl = "";
+
+// Fungsi Fetch Gambar dari Supabase Storage
+const fetchImages = async () => {
+    try {
+        const { data, error } = await supabase.storage.from("funvibe-image").list();
+        if (error) throw error;
+
+        data.forEach(async (file) => {
+            const { data: urlData } = supabase.storage.from("funvibe-image").getPublicUrl(file.name);
+const publicURL = urlData.publicUrl;
+
+            const imgElement = document.createElement("img");
+            imgElement.src = publicURL;
+            imgElement.alt = file.name;
+
+            imgElement.addEventListener("click", () => {
+                modal.style.display = "flex";
+                modalImg.src = publicURL;
+                downloadBtn.href = publicURL;
+            });
+
+            galleryContainer.appendChild(imgElement);
+        });
+    } catch (error) {
+        console.error("Error fetching images:", error);
+    }
+};
+
+fetchImages();
+
+// Event untuk Menutup Modal
+closeModal.addEventListener("click", () => {
+    modal.style.display = "none";
+});
+
+// Event untuk Download dengan SweetAlert
+downloadBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    Swal.fire({
+        title: "Download Gambar?",
+        text: "Apakah Anda ingin mengunduh gambar ini?",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Ya, Download!",
+        cancelButtonText: "Batal"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const a = document.createElement("a");
+            a.href = currentImageUrl;
+            a.download = "image.jpg";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    });
+});
+</script>

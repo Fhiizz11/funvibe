@@ -22,6 +22,14 @@
       {
         "src": "/(.*)",
         "dest": "/server.js"
+      },
+      {
+        "src": "/doc/image",
+        "dest": "/server.js"
+      },
+      {
+        "src": "/doc/admin",
+        "dest": "/server.js"
       }
     ]
   }

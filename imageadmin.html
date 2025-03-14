@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Upload Gambar</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
+</head>
+<body class="bg-gray-100 p-6">
+    <div class="max-w-2xl mx-auto bg-white p-6 rounded-lg shadow-md">
+        <div class="flex justify-between items-center">
+            <h2 class="text-2xl font-semibold">Upload Gambar</h2>
+            <button id="logoutButton" onclick="logout()" class="bg-red-500 text-white px-4 py-2 rounded">Logout</button>
+        </div>
+        
+        <input type="file" id="fileInput" class="border p-2 w-full mt-4 mb-4" accept="image/*">
+        <button id="uploadButton" class="bg-blue-500 text-white px-4 py-2 rounded">Upload</button>
+        
+        <h2 class="text-2xl font-semibold mt-6">Daftar Gambar</h2>
+        <div id="imageList" class="mt-4 grid grid-cols-3 gap-4"></div>
+    </div>
+
+    <script type="module">
+        import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+        // Setup Supabase
+        const supabaseUrl = 'https://czqlfgvzzpmgddkjvsps.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN6cWxmZ3Z6enBtZ2Rka2p2c3BzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzI5MzgxOTUsImV4cCI6MjA0ODUxNDE5NX0.35iolc9qnkla8hK1ycYL6qOjEujK2YpSOoOGHz-fzPI';
+        const supabase = createClient(supabaseUrl, supabaseKey);
+        const bucketName = 'funvibe-image';
+
+        // Event listener setelah halaman selesai dimuat
+        document.addEventListener("DOMContentLoaded", () => {
+            document.getElementById("uploadButton").addEventListener("click", uploadImage);
+            loadImages();
+        });
+
+        async function uploadImage() {
+            const fileInput = document.getElementById('fileInput');
+            if (!fileInput.files.length) {
+                Swal.fire('Error', 'Pilih gambar terlebih dahulu!', 'error');
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const fileName = `${Date.now()}-${file.name}`;
+
+            Swal.fire({
+                title: 'Uploading...',
+                text: 'Harap tunggu sebentar',
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading()
+            });
+
+            // Upload ke Supabase Storage
+            const { data, error } = await supabase.storage
+                .from(bucketName)
+                .upload(fileName, file, { cacheControl: '3600', upsert: false });
+
+            if (error) {
+                console.error('Upload Error:', error.message);
+                Swal.fire('Error', `Gagal mengunggah gambar! ${error.message}`, 'error');
+            } else {
+                Swal.fire('Sukses', 'Gambar berhasil diunggah!', 'success');
+                loadImages(); // Refresh daftar gambar
+            }
+        }
+
+        async function loadImages() {
+            const { data, error } = await supabase.storage.from(bucketName).list('', { limit: 1000 });
+
+            const imageList = document.getElementById('imageList');
+            imageList.innerHTML = '';
+
+            if (error) {
+                console.error('Load Image Error:', error.message);
+                Swal.fire('Error', `Gagal memuat daftar gambar! ${error.message}`, 'error');
+                return;
+            }
+
+            if (data.length === 0) {
+                imageList.innerHTML = '<p class="text-gray-500">Belum ada gambar.</p>';
+                return;
+            }
+
+            data.forEach(file => {
+                const { data: publicURL } = supabase.storage.from(bucketName).getPublicUrl(file.name);
+                const imageUrl = publicURL.publicUrl;
+
+                const imageElement = document.createElement('div');
+                imageElement.classList.add('relative', 'cursor-pointer');
+
+                imageElement.innerHTML = `
+                    <img src="${imageUrl}" class="w-full h-24 object-cover rounded shadow cursor-pointer">
+                    <button class="delete-btn absolute top-2 right-2 bg-red-500 text-white px-2 py-1 text-xs rounded" data-name="${file.name}">Hapus</button>
+                `;
+
+                imageElement.querySelector("img").addEventListener("click", () => {
+                    Swal.fire({
+                        imageUrl: imageUrl,
+                        imageWidth: 600,
+                        imageAlt: "Gambar",
+                        showCloseButton: true,
+                        showConfirmButton: false
+                    });
+                });
+
+                imageList.appendChild(imageElement);
+            });
+
+            document.querySelectorAll('.delete-btn').forEach(button => {
+                button.addEventListener('click', () => deleteImage(button.dataset.name));
+            });
+        }
+
+        async function deleteImage(fileName) {
+            const confirmation = await Swal.fire({
+                title: 'Apakah Anda yakin?',
+                text: 'Gambar akan dihapus secara permanen!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, hapus!',
+                cancelButtonText: 'Batal'
+            });
+
+            if (confirmation.isConfirmed) {
+                const { error } = await supabase.storage.from(bucketName).remove([fileName]);
+
+                if (error) {
+                    console.error('Delete Error:', error.message);
+                    Swal.fire('Error', `Gagal menghapus gambar! ${error.message}`, 'error');
+                } else {
+                    Swal.fire('Sukses', 'Gambar berhasil dihapus!', 'success');
+                    loadImages();
+                }
+            }
+        }
+
+
+        function logout() {
+            Swal.fire({
+                title: 'Konfirmasi Logout',
+                text: 'Apakah Anda yakin ingin logout?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, logout',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    sessionStorage.clear();
+                    Swal.fire('Logout Berhasil', 'Anda telah logout.', 'success').then(() => {
+                        window.location.href = "/doc/login";
+                    });
+                }
+            });
+        }
+
+        // Event listener setelah halaman selesai dimuat
+        document.addEventListener("DOMContentLoaded", () => {
+            document.getElementById("logoutButton").addEventListener("click", logout);
+            loadImages();
+        });
+    </script>
+</body>
+</html>
