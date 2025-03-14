@@ -38,8 +38,8 @@
 
         // Autentikasi
         document.addEventListener("DOMContentLoaded", () => {
-            const user = sessionStorage.getItem("user");
-            if (!user) {
+            const isLoggedIn = sessionStorage.getItem("isLoggedIn");
+            if (!isLoggedIn) {
                 window.location.href = "/doc/login";
             }
             document.getElementById("uploadButton").addEventListener("click", uploadImage);
