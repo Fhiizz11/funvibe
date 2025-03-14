@@ -36,6 +36,17 @@
             loadImages();
         });
 
+        // Autentikasi
+        document.addEventListener("DOMContentLoaded", () => {
+            const user = sessionStorage.getItem("user");
+            if (!user) {
+                window.location.href = "/doc/login";
+            }
+            document.getElementById("uploadButton").addEventListener("click", uploadImage);
+            document.getElementById("logoutButton").addEventListener("click", logout);
+            loadImages();
+        });
+
         async function uploadImage() {
             const fileInput = document.getElementById('fileInput');
             if (!fileInput.files.length) {
